@@ -13,7 +13,9 @@ var app = express();
 
 //Set up mongoose connection
 var mongoose = require('mongoose');
-var mongoDB = 'mongodb+srv://cc_lib:2vQUdhjBpT@cluster0.mifuv.azure.mongodb.net/cc_lib?retryWrites=true&w=majority';
+
+//Need MongoDB atlas connection string to connect database, don't leave here in public repo
+var mongoDB = 'your MongoDB connection string url';
 mongoose.connect(mongoDB, { useNewUrlParser: true });
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
