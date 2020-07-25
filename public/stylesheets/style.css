@@ -8,6 +8,8 @@ html {
   font-size: 18px;
 }
 body {
+  background: var(--bg-color);
+  color: var(--text-color);
   padding: 50px;
   font: 1rem "Gentium Book Basic", Arial, sans-serif;
 }
