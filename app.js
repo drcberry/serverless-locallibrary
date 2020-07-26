@@ -1,3 +1,9 @@
+//Set dotenv for MongoDB connection string
+//This needed to be at beginning for app to work
+var dotenv = require('dotenv');
+dotenv.config();
+var urlMongo = process.env.MONGO_DB_URI;
+
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -15,8 +21,9 @@ var app = express();
 var mongoose = require('mongoose');
 
 //Need MongoDB atlas connection string to connect database, don't leave here in public repo
-var mongoDB = 'Your MongoDB connection string';
-mongoose.connect(mongoDB, { useNewUrlParser: true });
+//Used dotenv to store locally
+var mongoDB = urlMongo;
+mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 

@@ -35,7 +35,14 @@ AuthorSchema
 AuthorSchema
 .virtual('lifespan')
 .get(function () {
-  return (this.date_of_death.getYear() - this.date_of_birth.getYear()).toString();
+  if(this.date_of_birth) {
+    DOB_formatted = moment(this.date_of_birth).format('MMMM DD YYYY');
+  } else {DOB_formatted = "No birthdate available"}
+  if(this.date_of_death) {
+    DOD_formatted = moment(this.date_of_death).format('MMMM DD YYYY');
+  } else {DOD_formatted = "Alive or no date of death available"}
+
+  return `${DOB_formatted} - ${DOD_formatted}`;
 });
 
 // Virtual for author's URL
@@ -44,11 +51,7 @@ AuthorSchema
 .get(function () {
   return '/catalog/author/' + this._id;
 });
-AuthorSchema
-.virtual('dob_format')
-.get(function() {
-  return this.date_of_birth ? moment(this.date_of_birth).format('MMMM DD,YYYY') : ''
-})
+
 
 //Export model
 module.exports = mongoose.model('Author', AuthorSchema);

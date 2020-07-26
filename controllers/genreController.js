@@ -1,4 +1,5 @@
 const validator = require('express-validator');
+const async = require('async');
 
 var Book = require('../models/book')
 var Genre = require('../models/genre');
@@ -51,10 +52,12 @@ exports.genre_create_get = function(req, res) {
 exports.genre_create_post =  [
    
   // Validate that the name field is not empty.
-  validator.body('name', 'Genre name required').trim().isLength({ min: 1 }),
+  validator.body('name', 'Genre name required').trim().isLength({ min: 1 }).escape(),
   
+  //Refactor due to sanitization middleware deprecated, sanitizeBody=>body
+  //chained escape() above
   // Sanitize (escape) the name field.
-  validator.sanitizeBody('name').escape(),
+  //validator.sanitizeBody('name').escape(),
 
   // Process request after validation and sanitization.
   (req, res, next) => {

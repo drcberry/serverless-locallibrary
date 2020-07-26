@@ -1,8 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Gentium+Book+Basic:ital,wght@0,400;0,700;1,400;1,700&family=Grenze+Gotisch:wght@400;700&display=swap');
 
 :root {
-  --bg-color: #111115;
-  --text-color: #ffe1ee;
+  --bg-color: #11111f;
+  --text-color: #eeefff;
+  --h1-color: #f46036;
+  --h2-color: #36f460;
+  --link-color: #20a4f3;
+  --my-warning: #ffe066;
 }
 html {
   font-size: 18px;
@@ -18,12 +22,23 @@ h1,h2,h3,h4 {
 }
 h1 {
   font-size: 2.2rem;
+  color: var(--h1-color);
 }
 h2 {
   font-size: 1.8rem;
+  color: var(--h2-color);
 }
 a {
-  color: #00B7FF;
+  color: var(--link-color);
+}
+.my-warning {
+  color: var(--my-warning);
+}
+.my-success {
+  color: var(--h2-color);
+}
+.my-danger {
+  color: var(--h1-color);
 }
 .sidebar-nav {
   margin-top: 20px;

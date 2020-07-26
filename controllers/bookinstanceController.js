@@ -1,5 +1,5 @@
-const { body,validationResult } = require('express-validator');
-const { sanitizeBody } = require('express-validator');
+const { body, validationResult } = require('express-validator');
+
 var BookInstance = require('../models/bookinstance');
 var Book = require('../models/book');
 
@@ -17,8 +17,21 @@ exports.bookinstance_list = function(req, res, next) {
 };
 
 // Display detail page for a specific BookInstance.
-exports.bookinstance_detail = function(req, res) {
-  res.send('NOT IMPLEMENTED: BookInstance detail: ' + req.params.id);
+exports.bookinstance_detail = function(req, res, next) {
+
+  BookInstance.findById(req.params.id)
+  .populate('book')
+  .exec(function (err, bookinstance) {
+    if (err) { return next(err); }
+    if (bookinstance==null) { // No results.
+        var err = new Error('Book copy not found');
+        err.status = 404;
+        return next(err);
+      }
+    // Successful, so render.
+    res.render('bookinstance_detail', { title: 'Copy: '+bookinstance.book.title, bookinstance:  bookinstance});
+  })
+
 };
 
 // Display BookInstance create form on GET.
@@ -41,11 +54,12 @@ exports.bookinstance_create_post = [
   body('imprint', 'Imprint must be specified').trim().isLength({ min: 1 }),
   body('due_back', 'Invalid date').optional({ checkFalsy: true }).isISO8601(),
   
+  //Change to body to body due to sanitization middleware deprecated
   // Sanitize fields.
-  sanitizeBody('book').escape(),
-  sanitizeBody('imprint').escape(),
-  sanitizeBody('status').trim().escape(),
-  sanitizeBody('due_back').toDate(),
+  body('book').escape(),
+  body('imprint').escape(),
+  body('status').trim().escape(),
+  body('due_back').toDate(),
   
   // Process request after validation and sanitization.
   (req, res, next) => {

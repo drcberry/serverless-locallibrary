@@ -1,5 +1,5 @@
-const { body,validationResult } = require('express-validator');
-const { sanitizeBody } = require('express-validator');
+const { body, validationResult } = require('express-validator');
+
 var Book = require('../models/book');
 //Add async, andother var to perform callbacks then render page
 var Book = require('../models/book');
@@ -46,8 +46,32 @@ exports.book_list = function(req, res, next) {
 };
 
 // Display detail page for a specific book.
-exports.book_detail = function(req, res) {
-  res.send('NOT IMPLEMENTED: Book detail: ' + req.params.id);
+exports.book_detail = function(req, res, next) {
+
+    async.parallel({
+        book: function(callback) {
+
+            Book.findById(req.params.id)
+              .populate('author')
+              .populate('genre')
+              .exec(callback);
+        },
+        book_instance: function(callback) {
+
+          BookInstance.find({ 'book': req.params.id })
+          .exec(callback);
+        },
+    }, function(err, results) {
+        if (err) { return next(err); }
+        if (results.book==null) { // No results.
+            var err = new Error('Book not found');
+            err.status = 404;
+            return next(err);
+        }
+        // Successful, so render.
+        res.render('book_detail', { title: results.book.title, book: results.book, book_instances: results.book_instance } );
+    });
+
 };
 
 // Display book create form on GET.
@@ -87,8 +111,10 @@ exports.book_create_post = [
   body('summary', 'Summary must not be empty.').trim().isLength({ min: 1 }),
   body('isbn', 'ISBN must not be empty').trim().isLength({ min: 1 }),
 
+  //Replace sanitize with body to sanitize due to sanitizer middleware deprecated
   // Sanitize fields (using wildcard).
-  sanitizeBody('*').escape(),
+  //body('*').escape(),
+  body('*').escape(),
 
   // Process request after validation and sanitization.
   (req, res, next) => {
@@ -188,16 +214,16 @@ exports.book_update_get = function(req, res, next) {
 // Handle book update on POST.
 exports.book_update_post = [
 
-  // Convert the genre to an array
-  (req, res, next) => {
-      if(!(req.body.genre instanceof Array)){
+    // Convert the genre to an array
+    (req, res, next) => {
+        if(!(req.body.genre instanceof Array)){
           if(typeof req.body.genre==='undefined')
           req.body.genre=[];
           else
           req.body.genre=new Array(req.body.genre);
-      }
-      next();
-  },
+        }
+        next();
+    },
  
   // Validate fields.
   body('title', 'Title must not be empty.').trim().isLength({ min: 1 }),
@@ -206,11 +232,11 @@ exports.book_update_post = [
   body('isbn', 'ISBN must not be empty').trim().isLength({ min: 1 }),
 
   // Sanitize fields.
-  sanitizeBody('title').escape(),
-  sanitizeBody('author').escape(),
-  sanitizeBody('summary').escape(),
-  sanitizeBody('isbn').escape(),
-  sanitizeBody('genre.*').escape(),
+  body('title').escape(),
+  body('author').escape(),
+  body('summary').escape(),
+  body('isbn').escape(),
+  body('genre.*').escape(),
 
   // Process request after validation and sanitization.
   (req, res, next) => {
@@ -228,7 +254,7 @@ exports.book_update_post = [
           _id:req.params.id //This is required, or a new ID will be assigned!
          });
 
-      if (!errors.isEmpty()) {
+        if (!errors.isEmpty()) {
           // There are errors. Render form again with sanitized values/error messages.
 
           // Get all authors and genres for form.
