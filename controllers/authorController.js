@@ -198,13 +198,13 @@ exports.author_update_post = [
           res.render('author_form', { title: 'Create Author', author: req.body, errors: errors.array() });
           return;
         }
-          else {
-          // Data from form is valid. Update author details
-          Author.findByIdAndUpdate(req.params.id, author, {}, function(err, newauthor) {
+        else {
+            // Data from form is valid. Update author details
+            Author.findByIdAndUpdate(req.params.id, author, {}, function(err, newauthor) {
               if (err) { return next(err); }
               // Successful - redirect to new author details.
               res.redirect(newauthor.url);
-          });
+            });
           }
-        }
+    }
 ];
