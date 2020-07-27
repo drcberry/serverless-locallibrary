@@ -1,4 +1,4 @@
-const { body, validationResult } = require('express-validator');
+const validator = require('express-validator');
 
 var Book = require('../models/book');
 //Add async, andother var to perform callbacks then render page
@@ -106,21 +106,21 @@ exports.book_create_post = [
   },
 
   // Validate fields.
-  body('title', 'Title must not be empty.').trim().isLength({ min: 1 }),
-  body('author', 'Author must not be empty.').trim().isLength({ min: 1 }),
-  body('summary', 'Summary must not be empty.').trim().isLength({ min: 1 }),
-  body('isbn', 'ISBN must not be empty').trim().isLength({ min: 1 }),
+  validator.body('title', 'Title must not be empty.').trim().isLength({ min: 1 }),
+  validator.body('author', 'Author must not be empty.').trim().isLength({ min: 1 }),
+  validator.body('summary', 'Summary must not be empty.').trim().isLength({ min: 1 }),
+  validator.body('isbn', 'ISBN must not be empty').trim().isLength({ min: 1 }),
 
   //Replace sanitize with body to sanitize due to sanitizer middleware deprecated
   // Sanitize fields (using wildcard).
   //body('*').escape(),
-  body('*').escape(),
+  validator.body('*').escape(),
 
   // Process request after validation and sanitization.
   (req, res, next) => {
       
       // Extract the validation errors from a request.
-      const errors = validationResult(req);
+      const errors = validator.validationResult(req);
 
       // Create a Book object with escaped and trimmed data.
       var book = new Book(
@@ -167,8 +167,24 @@ exports.book_create_post = [
 ];
 
 // Display book delete form on GET.
-exports.book_delete_get = function(req, res) {
-  res.send('NOT IMPLEMENTED: Book delete GET');
+exports.book_delete_get = function(req, res, next) {
+    //Get Book and any linked authors or genres
+    async.parallel({
+        book: function(callback) {
+          Book.findById(req.params.id).exec(callback);
+        },
+        book_instances: function(callback) {
+          BookInstance.find({book:req.params.id}).exec(callback);
+        }
+        
+    }, function(err, results) {
+        if (err) { return next(err); }
+        if (results.book==null) { // No results.
+            res.redirect('/catalog/books');
+        }
+        //Render author form with details
+        res.render('book_delete', {title: 'Delete Book', book: results.book, book_instances: results.book_instances});
+    });
 };
 
 // Handle book delete on POST.
@@ -226,23 +242,23 @@ exports.book_update_post = [
     },
  
   // Validate fields.
-  body('title', 'Title must not be empty.').trim().isLength({ min: 1 }),
-  body('author', 'Author must not be empty.').trim().isLength({ min: 1 }),
-  body('summary', 'Summary must not be empty.').trim().isLength({ min: 1 }),
-  body('isbn', 'ISBN must not be empty').trim().isLength({ min: 1 }),
+  validator.body('title', 'Title must not be empty.').trim().isLength({ min: 1 }),
+  validator.body('author', 'Author must not be empty.').trim().isLength({ min: 1 }),
+  validator.body('summary', 'Summary must not be empty.').trim().isLength({ min: 1 }),
+  validator.body('isbn', 'ISBN must not be empty').trim().isLength({ min: 1 }),
 
   // Sanitize fields.
-  body('title').escape(),
-  body('author').escape(),
-  body('summary').escape(),
-  body('isbn').escape(),
-  body('genre.*').escape(),
+  validator.body('title').escape(),
+  validator.body('author').escape(),
+  validator.body('summary').escape(),
+  validator.body('isbn').escape(),
+  validator.body('genre.*').escape(),
 
   // Process request after validation and sanitization.
   (req, res, next) => {
 
       // Extract the validation errors from a request.
-      const errors = validationResult(req);
+      const errors = validator.validationResult(req);
 
       // Create a Book object with escaped/trimmed data and old id.
       var book = new Book(
@@ -282,8 +298,8 @@ exports.book_update_post = [
           // Data from form is valid. Update the record.
           Book.findByIdAndUpdate(req.params.id, book, {}, function (err,thebook) {
               if (err) { return next(err); }
-                 // Successful - redirect to book detail page.
-                 res.redirect(thebook.url);
+                // Successful - redirect to book detail page.
+                res.redirect(thebook.url);
               });
       }
   }
