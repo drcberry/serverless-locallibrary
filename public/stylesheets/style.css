@@ -35,6 +35,16 @@ h3 {
 a {
   color: var(--link-color);
 }
+#genre-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: auto;
+  margin: 40px 0;
+  grid-gap: 20px;
+}
+.genre-item {
+  justify-self: center;
+}
 .my-warning {
   color: var(--my-warning);
 }
