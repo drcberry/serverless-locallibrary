@@ -28,6 +28,10 @@ h2 {
   font-size: 1.8rem;
   color: var(--h2-color);
 }
+h3 {
+  font-size: 1.6rem;
+  color: var(--h2-color);
+}
 a {
   color: var(--link-color);
 }
