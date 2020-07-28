@@ -1,7 +1,8 @@
 //Set dotenv for MongoDB connection string
 //This needed to be at beginning for app to work
-var dotenv = require('dotenv');
-dotenv.config();
+
+//var dotenv = require('dotenv');
+//dotenv.config();
 var urlMongo = process.env.MONGO_DB_URI;
 
 var createError = require('http-errors');
