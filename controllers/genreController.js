@@ -108,7 +108,7 @@ exports.genre_create_post =  [
 ];
 
 // Display Genre delete form on GET.
-exports.genre_delete_get = function(req, res) {
+exports.genre_delete_get = function(req, res, next) {
     //Get Genre and any linked books
     async.parallel({
       genre: function(callback) {
@@ -128,7 +128,7 @@ exports.genre_delete_get = function(req, res) {
 };
 
 // Handle Genre delete on POST.
-exports.genre_delete_post = function(req, res) {
+exports.genre_delete_post = function(req, res, next) {
 
     async.parallel({
       genre: function(callback) {
@@ -140,16 +140,16 @@ exports.genre_delete_post = function(req, res) {
     }, function(err, results) {
         if(err) {return next(err);}
         if(results.genre_books.length > 0) {
-          //Still has books render same as get route
+          // Still has books... Render same as get route
           res.render('genre_delete', {title: 'Delete Genre', genre: results.genre, genre_books: results.genre_books});
           return;
         }
         else {
           //Genre has no books, now delete
-          Author.findByIdAndRemove(req.body.authorid, function deleteAuthor(err) {
+          Author.findByIdAndRemove(req.body.genreid, function deleteAuthor(err) {
             if (err) { return next(err); }
-            // Success - go to author list
-            res.redirect('/catalog/authors')
+            // Success - go to genre list
+            res.redirect('/catalog/genre')
         });
 
     }
@@ -158,7 +158,7 @@ exports.genre_delete_post = function(req, res) {
 };
 
 // Display Genre update form on GET.
-exports.genre_update_get = function(req, res) {
+exports.genre_update_get = function(req, res, next) {
     //Get genre to update
     Genre.findById(req.params.id, function(err, results) {
       if(err) {return next(err)}
