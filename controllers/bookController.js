@@ -103,7 +103,7 @@ exports.book_create_post = [
           req.body.genre=new Array(req.body.genre);
       }
       next();
-  },
+    },
 
   // Validate fields.
   validator.body('title', 'Title must not be empty.').trim().isLength({ min: 1 }),
@@ -129,7 +129,7 @@ exports.book_create_post = [
           summary: req.body.summary,
           isbn: req.body.isbn,
           genre: req.body.genre
-         });
+        });
 
       if (!errors.isEmpty()) {
           // There are errors. Render form again with sanitized values/error messages.
