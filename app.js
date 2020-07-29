@@ -24,7 +24,7 @@ var mongoose = require('mongoose');
 //Need MongoDB atlas connection string to connect database, don't leave here in public repo
 //Used dotenv to store locally
 var mongoDB = urlMongo;
-mongoose.connect(mongoDB, { useNewUrlParser: false, useUnifiedTopology: true })
+mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true })
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
