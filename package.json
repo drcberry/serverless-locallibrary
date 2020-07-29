@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "node --unhandled-rejections=strict ./bin/www",
+    "build": "node --unhandled-rejections=strict -r dotenv/config ./bin/www dot_env_path=.env",
     "start": "node ./bin/www",
     "devstart": "nodemon ./bin/www",
     "serverstart": "DEBUG=express-locallibrary-tutorial:* npm run devstart"
